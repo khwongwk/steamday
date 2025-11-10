@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖公會基顯小學 閱創未來．童心大探索開放日 簽名板</title>
+    <!-- 載入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Noto Sans TC 字體 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .futuristic-border {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+            border: 2px solid #3b82f6; /* Blue-500 */
+        }
+        .signature-display {
+            background-size: cover;
+            background-position: center;
+            /* 預設的背景圖：https://i.imgur.com/gDRoWIX.png */
+            background-image: url('https://i.imgur.com/gDRoWIX.png');
+            min-height: 100vh;
+        }
+        /* 確保畫廊容器可以作為絕對定位的參考 */
+        #signaturesGrid {
+            position: absolute;
+            top: 5rem; /* 避開返回按鈕 */
+            bottom: 0.5rem;
+            left: 0.5rem;
+            right: 0.5rem;
+        }
+
+        /* 畫廊模式的互動控制樣式 */
+        .signature-item {
+            /* 圖片本身不帶背景和邊框 */
+            transition: box-shadow 0.2s, border 0.2s;
+            touch-action: none; /* 允許在觸控設備上拖曳 */
+        }
+        
+        .signature-item.focused {
+            /* 焦點模式：顯示虛線邊框 (用於旋轉、拖拉、調整大小時的視覺回饋) */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); 
+            border: 2px dashed #fcd34d; /* Yellow dashed border */
+        }
+
+        /* 控制手柄 (預設隱藏，只有在 focused 時才顯示) */
+        .control-handle {
+            opacity: 0;
+            pointer-events: none; /* 預設禁用點擊 */
+            transition: opacity 0.2s;
+        }
+        
+        .signature-item.focused .control-handle {
+            opacity: 1;
+            pointer-events: auto; /* 焦點模式啟用點擊 */
+        }
+        
+        /* 焦點模式下的背景層 (輕微半透明灰色疊加層) */
+        .signature-item .signature-overlay {
+             position: absolute;
+             inset: 0;
+             opacity: 0;
+             transition: opacity 0.2s;
+             background-color: rgba(0, 0, 0, 0.1); 
+             border-radius: 0.5rem;
+        }
+        
+        .signature-item.focused .signature-overlay {
+            opacity: 1;
+        }
+
+        /* 旋轉手柄樣式 */
+        .rotate-handle {
+            top: -8px; 
+            right: -8px;
+            cursor: crosshair; /* 交叉線表示旋轉點 */
+            background-color: #3b82f6; /* Blue-500 */
+            border-color: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-4 flex flex-col md:flex-row transition-colors duration-500">
+
+    <!-- 主介面容器 (分為資訊區和操作區) -->
+    <div id="main-ui" class="flex-grow flex flex-col md:flex-row transition-all duration-500">
+        
+        <!-- 左側：資訊與控制區 -->
+        <div class="md:w-1/3 lg:w-1/4 p-4 md:p-6 bg-gray-800 rounded-xl futuristic-border m-2 flex flex-col">
+            <!-- 簡介區 -->
+            <div class="mb-6 p-4 border-b border-blue-500/50">
+                <!-- 聖公會基顯小學 Logo (1.3x 大小) -->
+                <!-- 更新 URL 並設置容器寬度為 100% -->
+                <div class="mb-3 mx-auto max-w-full">
+                    <img src="https://www.skhkeihin.edu.hk/image/logo.png" alt="聖公會基顯小學 Logo" class="max-w-full h-auto" onerror="this.onerror=null; this.src='https://placehold.co/300x80/2563EB/FFFFFF?text=聖公會基顯小學';" />
+                </div>
+                
+                <!-- 活動名稱 Logo (基準大小 - 約 75% 容器寬度，以實現 1.3x 比例差異) -->
+                <div class="mb-4 mx-auto max-w-[75%]">
+                    <img src="https://i.imgur.com/wBPQ0Y2.png" alt="閱創未來．童心大探索開放日 Logo" class="max-w-full h-auto" onerror="this.onerror=null; this.src='https://placehold.co/300x120/9333ea/FFFFFF?text=閱創未來．童心大探索開放日';" />
+                </div>
+                
+                <p class="text-sm lg:text-base text-gray-300">
+                    歡迎蒞臨基顯小學開放日，請於右方簽名留下您的足跡！
+                </p>
+            </div>
+
+            <!-- 控制區 -->
+            <div class="mt-auto space-y-4">
+                
+                <!-- 筆觸顏色選擇 -->
+                <div class="space-y-3 bg-gray-700 p-3 rounded-lg shadow-inner">
+                    <label class="text-sm font-medium text-blue-300 block">筆觸顏色選擇:</label>
+                    
+                    <!-- 預設顏色按鈕 -->
+                    <div id="presetColors" class="flex flex-wrap gap-2 mb-2">
+                        <!-- 白色 -->
+                        <button data-color="#FFFFFF" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-white shadow-md hover:ring-2 ring-blue-400 transition" title="白色"></button>
+                        <!-- 黑色 (預設) -->
+                        <button data-color="#000000" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-black shadow-md hover:ring-2 ring-blue-400 transition" title="黑色"></button>
+                        <!-- 紅色 -->
+                        <button data-color="#FF0000" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-red-600 shadow-md hover:ring-2 ring-blue-400 transition" title="紅色"></button>
+                        <!-- 藍色 -->
+                        <button data-color="#3b82f6" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-blue-500 shadow-md hover:ring-2 ring-blue-400 transition" title="藍色"></button>
+                        <!-- 金色 -->
+                        <button data-color="#FFD700" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-yellow-500 shadow-md hover:ring-2 ring-blue-400 transition" title="金色"></button>
+                        <!-- 紫色 -->
+                        <button data-color="#9333ea" class="color-preset w-8 h-8 rounded-full border-2 border-gray-400 bg-purple-600 shadow-md hover:ring-2 ring-blue-400 transition" title="紫色"></button>
+                    </div>
+
+                    <!-- 完整顏色選擇器 (預設值已修改為黑色，以在白色畫布上可見) -->
+                    <div class="flex items-center space-x-3">
+                        <label for="colorPicker" class="text-xs text-gray-300">完整調色盤 (RGB):</label>
+                        <input type="color" id="colorPicker" value="#000000" class="w-8 h-8 rounded-full border-none cursor-pointer p-0" title="選擇顏色">
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <button id="btnConfirm" class="w-full py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition duration-200 shadow-lg hover:shadow-green-500/50">
+                    確認
+                </button>
+                <button id="btnClear" class="w-full py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg transition duration-200 shadow-lg hover:shadow-red-500/50">
+                    清除
+                </button>
+                <button id="btnViewMode" class="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition duration-200 shadow-lg hover:shadow-purple-500/50">
+                    查看簽名板
+                </button>
+            </div>
+        </div>
+
+        <!-- 右側：簽名區 -->
+        <div class="md:w-2/3 lg:w-3/4 p-2 md:p-4 bg-gray-800 rounded-xl futuristic-border m-2 relative">
+            <!-- 簽名區背景為白色 -->
+            <canvas id="signatureCanvas" class="w-full h-full bg-white rounded-lg cursor-crosshair"></canvas>
+            <!-- Message Box -->
+            <div id="messageBox" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-900/80 text-white p-6 rounded-xl shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-10 w-64 text-center">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 畫廊模式容器 (隱藏狀態) -->
+    <div id="gallery-ui" class="signature-display hidden fixed inset-0 z-50 p-4 pt-10 overflow-hidden">
+        <button id="btnBackToSign" class="absolute top-4 left-4 py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-lg transition duration-200 z-50">
+            返回簽名
+        </button>
+        <!-- signaturesGrid 作為絕對定位簽名的容器 -->
+        <div id="signaturesGrid" class="relative">
+            <!-- 簽名圖片將在這裡渲染 -->
+        </div>
+        <p id="loadingMessage" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-xl text-white">載入中，請稍候...</p>
+    </div>
+
+
+    <!-- 引入 Firebase 必要的模組 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase 設定與初始化 ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // 設定 Firestore 偵錯級別，有助於開發
+        setLogLevel('Debug');
+
+        let app, db, auth, userId = null;
+        let isAuthReady = false;
+        
+        if (Object.keys(firebaseConfig).length > 0) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } else {
+            console.error("Firebase 配置遺失。應用程式將無法儲存資料。");
+            db = { isMock: true };
+        }
+
+        // 集合路徑：/artifacts/{appId}/public/data/signatures
+        const getCollectionRef = (dbInstance) => {
+            return collection(dbInstance, `artifacts/${appId}/public/data/signatures`);
+        };
+        
+        // 執行 Firebase 認證
+        const setupAuth = async () => {
+            if (auth) {
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Firebase: 使用 Custom Token 登入成功。");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("Firebase: 匿名登入成功。");
+                    }
+                } catch (error) {
+                    console.error("Firebase 登入失敗:", error);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("用戶 ID:", userId);
+                    } else {
+                        userId = crypto.randomUUID();
+                        console.log("用戶未登入，使用隨機 ID:", userId);
+                    }
+                    isAuthReady = true;
+                    if (!db.isMock) {
+                        listenForSignatures();
+                    }
+                });
+            } else {
+                userId = crypto.randomUUID();
+                isAuthReady = true;
+                console.log("模擬模式啟動。");
+            }
+        };
+
+
+        // --- 簽名板核心邏輯 ---
+
+        const canvas = document.getElementById('signatureCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const presetColorsContainer = document.getElementById('presetColors');
+        const btnClear = document.getElementById('btnClear');
+        const btnConfirm = document.getElementById('btnConfirm');
+        const btnViewMode = document.getElementById('btnViewMode');
+        const btnBackToSign = document.getElementById('btnBackToSign');
+        const messageBox = document.getElementById('messageBox');
+        const mainUI = document.getElementById('main-ui');
+        const galleryUI = document.getElementById('gallery-ui');
+        const signaturesGrid = document.getElementById('signaturesGrid');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        let isDrawing = false;
+        let penColor = colorPicker.value; 
+        let pathData = []; // 儲存當前簽名路徑: [{x, y, color, width, isNewStroke}, ...]
+        // NEW: 追蹤上一個捕捉到的原始點 (P_i)，用於計算下一個曲線段的控制點。
+        let lastRawPoint = null; 
+
+        // 簽名資料庫陣列
+        let allSignatures = []; 
+        let currentMode = 'sign'; // 'sign' or 'view'
+        
+        // 簽名圖片預設長寬 (已更新為 100px)
+        const DEFAULT_SIGNATURE_SIZE = 100;
+        
+        // 畫廊模式的簽名轉換狀態 (x, y, 旋轉角度, 寬度, 高度)
+        let signatureTransforms = {}; 
+        // { id: { x: 0, y: 0, r: 0, w: 100, h: 100 } }
+        let activeTransform = null; // { mode: 'drag'|'resize'|'rotate', elementId: string, ... }
+        let activeSignatureId = null; // 當前聚焦的簽名 ID
+        
+        // 畫布設定
+        const setupCanvas = () => {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = penColor;
+        }
+        
+        // 顯示訊息 (更新為支援按鈕)
+        const showMessage = (text, isError = false, actionButton = null) => {
+            // Clear existing content
+            messageBox.innerHTML = '';
+            
+            // Set base class
+            messageBox.className = 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-6 rounded-xl shadow-2xl transition-opacity duration-300 z-10 text-white w-64 text-center';
+            
+            if (isError) {
+                messageBox.classList.add('bg-red-700/80');
+            } else {
+                messageBox.classList.add('bg-blue-600/80');
+            }
+
+            // Add message text
+            const textElement = document.createElement('p');
+            textElement.className = 'mb-4 font-semibold';
+            textElement.textContent = text;
+            messageBox.appendChild(textElement);
+
+            if (actionButton) {
+                const btn = document.createElement('button');
+                btn.className = 'w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition duration-200';
+                btn.textContent = actionButton.text;
+                btn.onclick = () => {
+                    messageBox.classList.add('opacity-0', 'pointer-events-none');
+                    actionButton.action();
+                };
+                messageBox.appendChild(btn);
+            } else {
+                // For simple messages, auto-hide
+                setTimeout(() => {
+                    messageBox.classList.add('opacity-0', 'pointer-events-none');
+                }, 3000);
+            }
+            
+            // Show the box
+            messageBox.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // 重新繪製整個路徑（使用二次貝塞爾曲線進行平滑重繪）
+        const redrawPath = (path, context, scaleX = 1, scaleY = 1, offsetX = 0, offsetY = 0) => {
+            if (!context || !path || path.length === 0) {
+                if (scaleX === 1 && scaleY === 1) {
+                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                }
+                return;
+            }
+
+            if (scaleX === 1 && scaleY === 1) {
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            }
+
+            let lastPoint = null;
+
+            for (let i = 0; i < path.length; i++) {
+                const currentPoint = path[i];
+
+                if (currentPoint.isNewStroke) {
+                    // Start of a new stroke (P0)
+                    context.beginPath();
+                    context.strokeStyle = currentPoint.color || '#FFFFFF'; 
+                    context.lineWidth = currentPoint.width || 5;
+                    context.moveTo(
+                        currentPoint.x * scaleX + offsetX, 
+                        currentPoint.y * scaleY + offsetY
+                    );
+                    
+                    lastPoint = currentPoint;
+                    
+                    // If it's the only point, draw a dot by extending and stroking
+                    if (path.length === 1 || (i === path.length - 1 && !currentPoint.isNewStroke)) {
+                         context.lineTo(lastPoint.x * scaleX + offsetX, lastPoint.y * scaleY + offsetY);
+                         context.stroke();
+                    }
+                    
+                } else {
+                    // Continuing stroke (P_i)
+                    if (lastPoint) {
+                        // P_{i-1} is lastPoint (control point), P_i is currentPoint (raw point)
+                        
+                        // Calculate the midpoint M_{i-1, i} (curve endpoint)
+                        const midX = (lastPoint.x + currentPoint.x) / 2;
+                        const midY = (lastPoint.y + currentPoint.y) / 2;
+
+                        // 更新樣式 (儘管風格通常在開始時設定，但為安全起見)
+                        context.strokeStyle = currentPoint.color || lastPoint.color || '#FFFFFF'; 
+                        context.lineWidth = currentPoint.width || lastPoint.width || 5; 
+
+                        context.quadraticCurveTo(
+                            lastPoint.x * scaleX + offsetX, 
+                            lastPoint.y * scaleY + offsetY, 
+                            midX * scaleX + offsetX, 
+                            midY * scaleY + offsetY
+                        );
+                        context.stroke();
+                        
+                        // Update lastPoint to currentPoint (P_i) for the next iteration (it becomes the next control point)
+                        lastPoint = currentPoint;
+                    }
+                }
+            }
+            
+            // 處理最後一個點：從最後一個中點到最後的原始點 P_last 畫一條直線，以正確閉合曲線
+            if (lastPoint && !lastPoint.isNewStroke) {
+                context.lineTo(
+                    lastPoint.x * scaleX + offsetX, 
+                    lastPoint.y * scaleY + offsetY
+                );
+                context.stroke();
+            }
+        };
+
+        // --- 繪圖事件處理 ---
+
+        const getCoords = (event) => {
+            let x, y;
+            if (event.touches) {
+                const rect = canvas.getBoundingClientRect();
+                x = event.touches[0].clientX - rect.left;
+                y = event.touches[0].clientY - rect.top;
+            } else {
+                x = event.offsetX;
+                y = event.offsetY;
+            }
+            return { x, y };
+        };
+
+        const startDrawing = (event) => {
+            if (currentMode === 'view') return;
+            isDrawing = true;
+            event.preventDefault(); 
+
+            const { x, y } = getCoords(event);
+            
+            // P0: 儲存原始點
+            const newPoint = { x: x, y: y, color: penColor, width: ctx.lineWidth, isNewStroke: true };
+            pathData.push(newPoint);
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y); // 將 context 移動到起始點 (P0)
+            
+            lastRawPoint = newPoint; // P0 是第一個控制點
+        };
+
+        const draw = (event) => {
+            if (!isDrawing || currentMode === 'view') return;
+            event.preventDefault();
+
+            const { x, y } = getCoords(event);
+            
+            // P_{i+1}: 儲存新的原始點
+            const newPoint = { x: x, y: y, color: penColor, width: ctx.lineWidth, isNewStroke: false };
+            pathData.push(newPoint);
+
+            // 至少需要兩個點才能開始畫曲線
+            if (pathData.length < 2 || !lastRawPoint) return; 
+
+            // P_i (lastRawPoint) 是控制點
+            // M_{i, i+1} (新中點) 是曲線終點
+            const midX = (lastRawPoint.x + x) / 2;
+            const midY = (lastRawPoint.y + y) / 2;
+
+            // 從當前 context 位置 (上一個中點 M_{i-1, i}) 畫到新中點 (M_{i, i+1})，使用 P_i 作為控制點
+            ctx.quadraticCurveTo(lastRawPoint.x, lastRawPoint.y, midX, midY);
+            
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            // P_{i+1} 成為下一個曲線段的控制點
+            lastRawPoint = newPoint;
+        };
+
+        const stopDrawing = () => {
+            if (currentMode === 'view') return;
+            
+            if (isDrawing && pathData.length > 0 && lastRawPoint) {
+                // 結束時，從最後一個中點 M_{last-1, last} 畫一條線到最終的原始點 P_last，以確保曲線閉合。
+                ctx.lineTo(lastRawPoint.x, lastRawPoint.y);
+                ctx.stroke();
+            }
+
+            isDrawing = false;
+            lastRawPoint = null; // 清除最後一個原始點
+        };
+
+        // --- 事件監聽器 ---
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+
+        colorPicker.addEventListener('input', (e) => {
+            penColor = e.target.value;
+            ctx.strokeStyle = penColor;
+        });
+
+        presetColorsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('color-preset')) {
+                const newColor = e.target.getAttribute('data-color');
+                penColor = newColor;
+                ctx.strokeStyle = penColor;
+                colorPicker.value = newColor; // 同步完整的顏色選擇器
+            }
+        });
+
+        btnClear.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pathData = [];
+            lastRawPoint = null;
+            showMessage("畫布已清除！");
+        });
+
+        btnConfirm.addEventListener('click', async () => {
+            if (pathData.length === 0) {
+                showMessage("請先簽名！", true);
+                return;
+            }
+
+            if (db.isMock) {
+                showMessage("資料庫未設定，無法儲存。", true);
+                return;
+            }
+
+            if (!isAuthReady) {
+                showMessage("認證中，請稍後再試。", true);
+                return;
+            }
+
+            try {
+                // 1. 找到簽名的最小邊界框 (Bounding Box)
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                let foundPoint = false;
+                
+                pathData.forEach(p => {
+                    minX = Math.min(minX, p.x);
+                    minY = Math.min(minY, p.y);
+                    maxX = Math.max(maxX, p.x);
+                    maxY = Math.max(maxY, p.y);
+                    foundPoint = true;
+                });
+
+                if (!foundPoint) {
+                    showMessage("簽名無效，請重新嘗試。", true);
+                    return;
+                }
+
+                // 2. 增加邊距並計算最終裁剪尺寸 (優化圖片大小)
+                const margin = 15; // 額外邊距，防止筆觸邊緣被裁剪
+                minX = Math.max(0, minX - margin);
+                minY = Math.max(0, minY - margin);
+                maxX = Math.min(canvas.width, maxX + margin);
+                maxY = Math.min(canvas.height, maxY + margin);
+
+                const cropWidth = maxX - minX;
+                const cropHeight = maxY - minY;
+
+                if (cropWidth <= 0 || cropHeight <= 0) {
+                    showMessage("簽名無效，請重新嘗試。", true);
+                    return;
+                }
+                
+                // 3. 創建一個臨時畫布用於裁剪和透明背景
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = cropWidth;
+                tempCanvas.height = cropHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // 設置繪圖樣式
+                tempCtx.lineCap = 'round';
+                tempCtx.lineJoin = 'round';
+
+                // 4. 將路徑繪製到臨時畫布上，並進行平移 (此臨時畫布預設為透明背景)
+                // 這裡調用更新後的 redrawPath，使用平移的座標軸 (cropWidth/Height)
+                redrawPath(pathData, tempCtx, 1, 1, -minX, -minY);
+
+
+                // 5. 轉換為 Base64 PNG 圖片 (透明背景且尺寸最佳化)
+                const base64Image = tempCanvas.toDataURL('image/png');
+
+                const signatureDoc = {
+                    base64Image: base64Image, 
+                    userId: userId,
+                    timestamp: Date.now(),
+                    imgWidth: cropWidth, 
+                    imgHeight: cropHeight
+                };
+                
+                await addDoc(getCollectionRef(db), signatureDoc);
+                
+                // --- UPDATED MESSAGE WITH BUTTON ---
+                showMessage(
+                    "簽名已成功儲存！",
+                    false,
+                    {
+                        text: "查看簽名板",
+                        action: btnViewMode.click.bind(btnViewMode) // 確保點擊事件正確觸發
+                    }
+                );
+                
+                // 儲存後清除畫布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pathData = [];
+                lastRawPoint = null;
+
+            } catch (e) {
+                console.error("儲存簽名失敗: ", e);
+                showMessage("儲存失敗，請檢查網路。", true);
+            }
+        });
+
+        // --- 畫廊模式 (查看簽名板) 邏輯：支援拖曳、旋轉和調整大小 ---
+        
+        // 輔助函式：檢查兩個矩形（未旋轉）是否重疊
+        const checkOverlap = (newX, newY, newW, newH, existingTransforms) => {
+            // 檢查新物件是否與任何已放置的物件重疊
+            const buffer = 10; // 邊距緩衝
+            for (const id in existingTransforms) {
+                if (existingTransforms.hasOwnProperty(id)) {
+                    const sig = existingTransforms[id];
+                    
+                    // 由於簽名是旋轉的，我們使用簡化的非旋轉邊界框碰撞檢測
+                    // X-axis collision
+                    if (newX < sig.x + sig.w + buffer && newX + newW > sig.x - buffer) {
+                        // Y-axis collision
+                        if (newY < sig.y + sig.h + buffer && newY + newH > sig.y - buffer) {
+                            return true; // 重疊
+                        }
+                    }
+                }
+            }
+            return false; // 沒有重疊
+        };
+
+        // 設定簽名圖片的焦點狀態
+        const setSignatureFocus = (newId) => {
+            // 1. 移除先前元素的焦點
+            if (activeSignatureId && activeSignatureId !== newId) {
+                const oldEl = document.getElementById(`sig-${activeSignatureId}`);
+                if (oldEl) {
+                    oldEl.classList.remove('focused');
+                    oldEl.style.zIndex = '50'; // 重設 Z-index
+                }
+            }
+            
+            // 2. 新增焦點到新元素
+            if (newId) {
+                const newEl = document.getElementById(`sig-${newId}`);
+                if (newEl) {
+                    newEl.classList.add('focused');
+                    newEl.style.zIndex = '100'; // 帶到最前面
+                }
+            }
+            
+            activeSignatureId = newId;
+        };
+        
+        // 點擊畫廊空白處時取消焦點
+        document.addEventListener('click', (event) => {
+            if (currentMode === 'view' && !event.target.closest('.signature-item') && !event.target.closest('#btnBackToSign')) {
+                setSignatureFocus(null); 
+            }
+        });
+
+        // 統一更新簽名轉換狀態
+        const updateSignatureTransform = (id, transform) => {
+            signatureTransforms[id] = { ...signatureTransforms[id], ...transform };
+            const el = document.getElementById(`sig-${id}`);
+            if (el) {
+                const { x, y, r, w, h } = signatureTransforms[id];
+                
+                // 確保寬度和高度有設定
+                if (w) el.style.width = `${w}px`;
+                if (h) el.style.height = `${h}px`;
+                
+                // 拖曳和旋轉
+                el.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+            }
+        };
+
+        const handlePointerDown = (event) => {
+            const isTouch = event.touches && event.touches.length === 1;
+            const clientX = isTouch ? event.touches[0].clientX : event.clientX;
+            const clientY = isTouch ? event.touches[0].clientY : event.clientY;
+
+            const target = event.target.closest('.signature-item');
+            if (!target) return;
+            
+            const id = target.id.replace('sig-', '');
+            setSignatureFocus(id); // 點擊時設定焦點
+            
+            const currentTransform = signatureTransforms[id];
+            
+            const isResizeHandle = event.target.classList.contains('resize-handle'); // 單一功能手柄
+            const isRotateHandle = event.target.classList.contains('rotate-handle'); // 新增旋轉手柄檢查
+
+            if (isResizeHandle) { 
+                 event.preventDefault(); 
+                 activeTransform = {
+                    mode: 'resize',
+                    elementId: id,
+                    startX: clientX,
+                    startY: clientY,
+                    startW: currentTransform.w || DEFAULT_SIGNATURE_SIZE, // 使用新的預設尺寸
+                    startH: currentTransform.h || DEFAULT_SIGNATURE_SIZE
+                 };
+            } else if (isRotateHandle) { // 旋轉邏輯
+                event.preventDefault(); 
+                
+                // 取得元素相對於視窗的位置和尺寸
+                const rect = target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // 計算從中心到起始點的角度 (弧度)
+                const initialAngleRad = Math.atan2(clientY - centerY, clientX - centerX);
+                const initialAngleDeg = initialAngleRad * (180 / Math.PI); // 轉換為角度
+
+                activeTransform = {
+                    mode: 'rotate',
+                    elementId: id,
+                    startX: clientX,
+                    startY: clientY,
+                    centerX: centerX, 
+                    centerY: centerY, 
+                    startR: currentTransform.r || 0,
+                    startAngleDeg: initialAngleDeg
+                };
+
+            } else {
+                // 拖曳模式 (點擊圖片主體)
+                event.preventDefault(); 
+
+                activeTransform = {
+                    mode: 'drag',
+                    elementId: id,
+                    startX: clientX,
+                    startY: clientY,
+                    startTranslateX: currentTransform.x || 0,
+                    startTranslateY: currentTransform.y || 0
+                };
+            }
+
+            // 確保阻止瀏覽器預設行為，尤其是拖曳 (passive: false)
+            document.addEventListener(isTouch ? 'touchmove' : 'mousemove', handlePointerMove, { passive: false });
+            document.addEventListener(isTouch ? 'touchend' : 'mouseup', handlePointerUp);
+        };
+
+        const handlePointerMove = (event) => {
+            if (!activeTransform) return;
+
+            const isTouch = event.touches && event.touches.length === 1;
+            const clientX = isTouch ? event.touches[0].clientX : event.clientX;
+            const clientY = isTouch ? event.touches[0].clientY : event.clientY;
+            
+            event.preventDefault(); 
+
+            const { mode, elementId } = activeTransform;
+
+            if (mode === 'drag') {
+                const dx = clientX - activeTransform.startX;
+                const dy = clientY - activeTransform.startY;
+
+                updateSignatureTransform(elementId, {
+                    x: activeTransform.startTranslateX + dx,
+                    y: activeTransform.startTranslateY + dy
+                });
+            } else if (mode === 'resize') { 
+                const dx = clientX - activeTransform.startX;
+                const dy = clientY - activeTransform.startY;
+                
+                // 為了保持近似比例，取較大的移動量作為縮放基準
+                const delta = Math.max(dx, dy); 
+                
+                // 新寬度和高度
+                let newW = Math.max(30, activeTransform.startW + delta); // 最小 30px (更小的最小尺寸)
+                let newH = Math.max(30, activeTransform.startH + delta);
+
+                updateSignatureTransform(elementId, {
+                    w: newW,
+                    h: newH
+                });
+            } else if (mode === 'rotate') { // 旋轉邏輯
+                const { elementId, centerX, centerY, startR, startAngleDeg } = activeTransform;
+
+                // 計算從中心到當前點的角度 (弧度)
+                const currentAngleRad = Math.atan2(clientY - centerY, clientX - centerX);
+                const currentAngleDeg = currentAngleRad * (180 / Math.PI);
+
+                // 計算角度差
+                const angleDiff = currentAngleDeg - startAngleDeg;
+
+                // 應用角度差到起始角度
+                const newR = startR + angleDiff;
+
+                updateSignatureTransform(elementId, {
+                    r: newR
+                });
+            }
+        };
+
+        const handlePointerUp = (event) => {
+            if (!activeTransform) return;
+            
+            // 清理監聽器
+            document.removeEventListener('mousemove', handlePointerMove);
+            document.removeEventListener('mouseup', handlePointerUp);
+            document.removeEventListener('touchmove', handlePointerMove);
+            document.removeEventListener('touchend', handlePointerUp);
+            
+            activeTransform = null;
+        };
+
+
+        btnViewMode.addEventListener('click', () => {
+            currentMode = 'view';
+            mainUI.classList.add('hidden');
+            galleryUI.classList.remove('hidden');
+            setSignatureFocus(null); // 進入畫廊時清除焦點
+            renderSignaturesGallery();
+        });
+
+        btnBackToSign.addEventListener('click', () => {
+            currentMode = 'sign';
+            galleryUI.classList.add('hidden');
+            mainUI.classList.remove('hidden');
+            setSignatureFocus(null); // 返回時清除焦點
+            setupCanvas(); 
+            redrawPath(pathData, ctx, 1, 1, 0, 0); 
+        });
+        
+        // 渲染畫廊中的所有簽名
+        const renderSignaturesGallery = () => {
+            if (db.isMock) {
+                showMessage("模擬模式無法顯示畫廊。", true);
+                loadingMessage.textContent = "資料庫未設定，無法載入簽名。";
+                return;
+            }
+
+            signaturesGrid.innerHTML = ''; 
+
+            if (allSignatures.length === 0) {
+                 loadingMessage.textContent = "目前沒有任何簽名。";
+                 loadingMessage.classList.remove('hidden');
+                 return;
+            }
+            
+            loadingMessage.classList.add('hidden'); 
+            
+            // 取得畫廊容器的尺寸以計算初始隨機位置
+            const gridWidth = signaturesGrid.clientWidth;
+            const gridHeight = signaturesGrid.clientHeight;
+            
+            const padding = 10; // 邊界緩衝
+            const maxPlacementAreaX = gridWidth - DEFAULT_SIGNATURE_SIZE - padding;
+            const maxPlacementAreaY = gridHeight - DEFAULT_SIGNATURE_SIZE - padding;
+
+
+            allSignatures.forEach(sigDoc => {
+                const id = sigDoc.id;
+                
+                // 1. 初始化轉換狀態 (如果不存在)
+                if (!signatureTransforms[id]) {
+                    
+                    const newW = DEFAULT_SIGNATURE_SIZE;
+                    const newH = DEFAULT_SIGNATURE_SIZE;
+                    let initialX = 0;
+                    let initialY = 0;
+                    
+                    // 尋找不重疊的位置
+                    let foundPosition = false;
+                    let attempts = 0;
+                    const maxAttempts = 50;
+                    
+                    while (!foundPosition && attempts < maxAttempts) {
+                        // 嘗試隨機位置
+                        initialX = Math.random() * maxPlacementAreaX + padding;
+                        initialY = Math.random() * maxPlacementAreaY + padding;
+                        
+                        // 檢查是否與已放置的簽名重疊
+                        if (checkOverlap(initialX, initialY, newW, newH, signatureTransforms)) {
+                            attempts++;
+                        } else {
+                            foundPosition = true;
+                        }
+                    }
+                    
+                    // 如果重疊無法避免 (達到最大嘗試次數)，則使用最後計算的位置 (它可能會重疊)
+                    if (!foundPosition) {
+                         console.warn(`無法在 ${maxAttempts} 次嘗試後找到不重疊的位置。`);
+                    }
+                    
+                    const initialR = 0; // 修正：預設為 0 度 (直放)
+
+                    signatureTransforms[id] = { 
+                        x: initialX, 
+                        y: initialY, 
+                        r: initialR,
+                        w: newW, 
+                        h: newH
+                    };
+                }
+
+                const { x, y, r, w, h } = signatureTransforms[id];
+
+                // 2. 創建可拖拉/調整大小的容器
+                const container = document.createElement('div');
+                container.id = `sig-${id}`;
+                // 移除 bg-gray-900/50 和 backdrop-blur-sm
+                // 移除 cursor-grab 讓它只在 img 上顯示
+                container.className = 'signature-item absolute p-1 rounded-lg z-50'; 
+                
+                container.style.width = `${w}px`; 
+                container.style.height = `${h}px`; 
+                container.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+                container.style.transformOrigin = 'center center';
+                
+                // 2.1 創建半透明背景覆蓋層 (只有在 focused 時才顯示)
+                const overlay = document.createElement('div');
+                overlay.className = 'signature-overlay';
+                container.appendChild(overlay);
+
+                // 3. 創建圖片元素
+                const img = document.createElement('img');
+                img.src = sigDoc.base64Image;
+                img.alt = '來賓簽名';
+                // 圖片主體現在處理拖曳 (cursor-grab)
+                img.className = 'w-full h-full object-contain relative z-10 cursor-grab'; 
+
+                // 4. 創建調整大小手柄 (左下角)
+                const resizeHandle = document.createElement('div');
+                // 使用 control-handle 類來控制顯示/隱藏
+                resizeHandle.className = 'resize-handle control-handle absolute -bottom-1 -left-1 w-4 h-4 bg-yellow-500 rounded-full cursor-nwse-resize border-2 border-white shadow-lg z-20';
+                resizeHandle.title = '調整大小';
+                
+                // 5. 創建旋轉手柄 (右上角)
+                const rotateHandle = document.createElement('div');
+                rotateHandle.className = 'rotate-handle control-handle absolute w-4 h-4 rounded-full cursor-crosshair border-2 border-white shadow-lg z-20';
+                rotateHandle.title = '旋轉';
+
+
+                container.appendChild(img);
+                container.appendChild(resizeHandle);
+                container.appendChild(rotateHandle); // 新增旋轉手柄
+                signaturesGrid.appendChild(container);
+
+                // 6. 附加事件監聽器 (使用 capture 階段確保在元素被拖曳前先設定焦點)
+                container.addEventListener('mousedown', handlePointerDown);
+                container.addEventListener('touchstart', handlePointerDown, { passive: false });
+                
+                // 如果是當前焦點元素，保持焦點狀態
+                if (activeSignatureId === id) {
+                    setSignatureFocus(id);
+                }
+            });
+        };
+
+
+        // --- Firestore 即時監聽 ---
+
+        const listenForSignatures = () => {
+            if (!db || db.isMock) return;
+
+            const q = query(getCollectionRef(db));
+
+            // onSnapshot 會在資料變動時即時更新
+            onSnapshot(q, (querySnapshot) => {
+                const newSignatures = [];
+                querySnapshot.forEach((doc) => {
+                    newSignatures.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // 根據時間戳記排序
+                newSignatures.sort((a, b) => a.timestamp - b.timestamp);
+                
+                allSignatures = newSignatures;
+                console.log(`即時更新：載入 ${allSignatures.length} 個簽名。`);
+                
+                if (currentMode === 'view') {
+                    // 重新渲染畫廊以顯示新簽名
+                    renderSignaturesGallery();
+                }
+            }, (error) => {
+                console.error("監聽簽名資料失敗:", error);
+                showMessage("資料載入失敗！", true);
+            });
+        };
+
+        // --- 初始化 ---
+
+        const init = () => {
+            setupCanvas();
+            window.addEventListener('resize', () => {
+                if (currentMode === 'sign') {
+                    setupCanvas();
+                    redrawPath(pathData, ctx, 1, 1, 0, 0);
+                } 
+            });
+
+            setupAuth();
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
